@@ -16,6 +16,14 @@ class Hero:
         self.abilities = []  # List to store abilities
         self.armors = []  # List to store armor objects
         self.weapons = []
+        self.deaths = 0
+        self.kills = 0
+
+    def add_kill(self, num_kills):
+        self.kills += num_kills
+
+    def add_death(self, num_deaths):
+        self.deaths += num_deaths
     
     def add_ability(self, ability):
         self.abilities.append(ability)
@@ -51,12 +59,18 @@ class Hero:
             opponent.take_damage(self_damage)
             if not opponent.is_alive():
                 print(f"{self.name} won!")
+                #update kills and deaths
+                self.add_kill(1)
+                opponent.add_death(1)
                 return
 
         opponent_damage = opponent.attack()
         self.take_damage(opponent_damage)
         if not self.is_alive():
             print(f"{opponent.name} won!")
+            #update kills and deaths
+            self.add_death(1)
+            opponent.add_kill(1)
             return
         
     def is_alive(self):

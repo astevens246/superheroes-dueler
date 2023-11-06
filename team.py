@@ -1,3 +1,4 @@
+import random
 from hero import Hero
 class Team:
     def __init__(self, name):
@@ -30,7 +31,41 @@ class Team:
 
     def add_hero(self, hero):
         self.heroes.append(hero)
+    
+    def stats(self):
+        for hero in self.heroes:
+            kd = hero.kills / hero.deaths
+            print(f"{hero.name} Kill/Deaths:{kd}")
 
+    def revive_heroes(self, health=100):
+        '''Reset all heroes' health to starting_health'''
+        for hero in self.heroes:
+            hero.current_health = hero.starting_health
+    def attack(self, other_team):
+        '''Battle each team against each other.'''
+        living_heroes = list(self.heroes)  # Copy of your heroes
+        living_opponents = list(other_team.heroes)  # Copy of opponent heroes
+
+        while len(living_heroes) > 0 and len(living_opponents) > 0:
+            # Step 1: Randomly select a living hero from each team
+            hero = random.choice(living_heroes)
+            opponent = random.choice(living_opponents)
+
+            # Step 2: Have the heroes fight each other
+            hero.fight(opponent)
+
+            # Step 3: Update the list of living_heroes and living_opponents
+            if not hero.is_alive():
+                living_heroes.remove(hero)
+                self.remove_hero(hero.name)  # Remove defeated hero from the team
+                other_team.add_hero(hero)  # Add defeated hero to the opponent's team
+
+            if not opponent.is_alive():
+                living_opponents.remove(opponent)
+                other_team.remove_hero(opponent.name)  # Remove defeated opponent from their team
+                self.add_hero(opponent)  # Add defeated opponent to your team
+
+    
 # Create a team
 my_team = Team("Avengers")
 
