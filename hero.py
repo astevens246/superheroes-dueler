@@ -90,5 +90,3 @@ if __name__ == "__main__":
     print(hero.attack())
     # Fight each hero until a victor emerges
 
-'''while my_hero.current_health > 0 and opponent_hero.current_health > 0:
-    my_hero.fight(opponent_hero)'''
