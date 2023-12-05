@@ -17,14 +17,12 @@ class Arena:
     def create_weapon(self):
         name = input("Enter the weapon's name: ")
         max_damage = int(input("Enter the weapon's maximum damage: "))
-        new_weapon = Weapon(name, max_damage)
-        return new_weapon
+        return Weapon(name, max_damage)
 
     def create_armor(self):
         name = input("Enter the armor's name: ")
         max_block = int(input("Enter the armor's maximum block: "))
-        new_armor = Armor(name, max_block)
-        return new_armor
+        return Armor(name, max_block)
 
     def create_hero(self):
         hero_name = input("Hero's name: ")
@@ -49,89 +47,85 @@ class Arena:
             hero = self.create_hero()
             self.team_one.add_hero(hero)
 
-  # Now implement build_team_two
-  #HINT: If you get stuck, look at how build_team_one is implemented
     def build_team_two(self):
         numOfTeamMembers = int(input("How many members would you like on Team Two?\n"))
         for _ in range(numOfTeamMembers):
             hero = self.create_hero()
             self.team_two.add_hero(hero)
 
-def show_stats(self):
-    '''Prints team statistics to terminal.'''
-    # TODO: This method should print out battle statistics
-    # including each team's average kill/death ratio.
-    # Required Stats:
-    #     Show surviving heroes.
-    #     Declare winning team
-    #     Show both teams' average kill/death ratio.
-    # Loop through the heroes in Team One to calculate their statistics
-    team_kills = 0
-    team_deaths = 0
-    for hero in self.team_one.heroes:
-        team_kills += hero.kills
-        team_deaths += hero.deaths
-    
-    # Handle the case where there are no deaths to avoid division by zero
-    if team_deaths == 0:
-        team_deaths = 1
+    def team_battle(self):
+        while self.team_one.num_alive() > 0 and self.team_two.num_alive() > 0:
+            print("Before attacks:")
+            print(f"Team One has {self.team_one.num_alive()} heroes alive.")
+            print(f"Team Two has {self.team_two.num_alive()} heroes alive.")
 
-    # Calculate and print Team One's average K/D ratio
-    print(self.team_one.name + " statistics:")
-    print(f"Surviving heroes from {self.team_one.name}:")
-    for hero in self.team_one.heroes:
-        if hero.is_alive():
-            print(hero.name)
-    print(f"Average K/D ratio for {self.team_one.name}: {team_kills/team_deaths}\n")
+            self.team_one.attack(self.team_two)
+            self.team_two.attack(self.team_one)
 
-    # Loop through the heroes in Team Two to calculate their statistics
-    team_kills = 0
-    team_deaths = 0
-    for hero in self.team_two.heroes:
-        team_kills += hero.kills
-        team_deaths += hero.deaths
+            print("After attacks:")
+            print(f"Team One has {self.team_one.num_alive()} heroes alive.")
+            print(f"Team Two has {self.team_two.num_alive()} heroes alive.")
 
-    # Handle the case where there are no deaths to avoid division by zero
-    if team_deaths == 0:
-        team_deaths = 1
+        # Check which team has surviving heroes
+        if self.team_one.num_alive() > 0:
+            print(f"{self.team_one.name} is the winning team!")
+        elif self.team_two.num_alive() > 0:
+            print(f"{self.team_two.name} is the winning team!")
+        else:
+            print("It's a draw! Both teams have no surviving heroes.")
 
-    # Calculate and print Team Two's average K/D ratio
-    print(self.team_two.name + " statistics:")
-    print(f"Surviving heroes from {self.team_two.name}:")
-    for hero in self.team_two.heroes:
-        if hero.is_alive():
-            print(hero.name)
-    print(f"Average K/D ratio for {self.team_two.name}: {team_kills/team_deaths}\n")
 
-    # Declare the winning team based on the number of surviving heroes
-    if self.team_one.num_alive() > self.team_two.num_alive():
-        print(f"{self.team_one.name} is the winning team!")
-    elif self.team_two.num_alive() > self.team_one.num_alive():
-        print(f"{self.team_two.name} is the winning team!")
-    else:
-        print("It's a draw! Both teams have an equal number of surviving heroes.")
+
+
+    def show_stats(self):
+        print("\n")
+        print(self.team_one.name + " statistics: ")
+        self.team_one.stats()
+        print("\n")
+        print(self.team_two.name + " statistics: ")
+        self.team_two.stats()
+        print("\n")
+
+        # Calculate and display the average K/D for Team One
+        self.display_average_kd(self.team_one)
+
+        # Calculate and display the average K/D for Team Two
+        self.display_average_kd(self.team_two)
+
+        # Display heroes from Team One that survived
+        self.display_surviving_heroes(self.team_one)
+
+        # Display heroes from Team Two that survived
+        self.display_surviving_heroes(self.team_two)
+
+    def display_average_kd(self, team):
+        team_kills = sum(hero.kills for hero in team.heroes)
+        team_deaths = sum(hero.deaths for hero in team.heroes)
+
+        if team_deaths == 0:
+            team_deaths = 1
+
+        print(team.name + " average K/D was: " + str(team_kills/team_deaths))
+
+    def display_surviving_heroes(self, team):
+        for hero in team.heroes:
+            if hero.is_alive():
+                print("Survived from " + team.name + ": " + hero.name)
 
 if __name__ == "__main__":
     game_is_running = True
-
-    # Instantiate Game Arena
     arena = Arena()
 
-    #Build Teams
     arena.build_team_one()
     arena.build_team_two()
 
     while game_is_running:
-
         arena.team_battle()
         arena.show_stats()
         play_again = input("Play Again? Y or N: ")
 
-        #Check for Player Input
         if play_again.lower() == "n":
             game_is_running = False
-
         else:
-            #Revive heroes to play again
             arena.team_one.revive_heroes()
             arena.team_two.revive_heroes()

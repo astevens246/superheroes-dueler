@@ -1,10 +1,10 @@
 import random
 from hero import Hero
+
 class Team:
     def __init__(self, name):
         self.name = name
         self.heroes = list()
-
 
     def remove_hero(self, name):
         '''Remove hero from heroes list.
@@ -21,8 +21,7 @@ class Team:
         # if we looped through our list and did not find our hero,
         # the indicator would have never changed, so return 0
         if not foundHero:
-            return 0   
-
+            return 0
 
     def view_all_heroes(self):
         """Print a list of all the team's heroes to the terminal."""
@@ -31,22 +30,27 @@ class Team:
 
     def add_hero(self, hero):
         self.heroes.append(hero)
-    
+
     def stats(self):
+        '''Print team statistics'''
         for hero in self.heroes:
-            kd = hero.kills / hero.deaths
-            print(f"{hero.name} Kill/Deaths:{kd}")
+            kd = hero.kills / max(1, hero.deaths)  # Avoid division by zero
+            print(f"{hero.name} Kill/Deaths: {kd}")
 
     def revive_heroes(self, health=100):
         '''Reset all heroes' health to starting_health'''
         for hero in self.heroes:
             hero.current_health = hero.starting_health
-    def attack(self, other_team):
-        '''Battle each team against each other.'''
-        living_heroes = list(self.heroes)  # Copy of your heroes
-        living_opponents = list(other_team.heroes)  # Copy of opponent heroes
 
-        while len(living_heroes) > 0 and len(living_opponents) > 0:
+    def attack(self, other_team):
+        living_heroes = list(self.heroes)
+        living_opponents = list(other_team.heroes)
+
+        max_rounds = 100  # Add max_rounds variable
+
+        rounds = 0  # Initialize rounds counter
+
+        while len(living_heroes) > 0 and len(living_opponents) > 0 and rounds < max_rounds:
             # Step 1: Randomly select a living hero from each team
             hero = random.choice(living_heroes)
             opponent = random.choice(living_opponents)
@@ -65,18 +69,43 @@ class Team:
                 other_team.remove_hero(opponent.name)  # Remove defeated opponent from their team
                 self.add_hero(opponent)  # Add defeated opponent to your team
 
-    
-# Create a team
-my_team = Team("Avengers")
+            rounds += 1  # Increment rounds counter
 
-#Create instances of Heros
+    def num_alive(self):
+        """Return the number of heroes alive on the team."""
+        alive_heroes = [hero for hero in self.heroes if hero.is_alive()]
+        return len(alive_heroes)
+
+# Create teams
+team1 = Team("Avengers")
+team2 = Team("Justice League")
+
+# Create instances of Heroes
 hero1 = Hero("Superman")
 hero2 = Hero("Batman")
+hero3 = Hero("Wonder Woman")
+hero4 = Hero("The Flash")
 
-# Add heroes to the team (assuming you have Hero objects)
-my_team.add_hero(hero1)
-my_team.add_hero(hero2)
+# Add heroes to the teams (assuming you have Hero objects)
+team1.add_hero(hero1)
+team1.add_hero(hero2)
 
-# View all heroes in the team
-my_team.view_all_heroes()
+team2.add_hero(hero3)
+team2.add_hero(hero4)
 
+# View all heroes in each team
+print("Team 1:")
+team1.view_all_heroes()
+
+print("\nTeam 2:")
+team2.view_all_heroes()
+
+# Attack one team against another
+team1.attack(team2)
+
+# View stats for each team
+print("\nTeam 1 Stats:")
+team1.stats()
+
+print("\nTeam 2 Stats:")
+team2.stats()
